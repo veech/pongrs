@@ -5,11 +5,19 @@ use sdl2::video::{Window, WindowContext};
 
 const DEFAULT_POSITION: (i32, i32) = (0, 0);
 
-pub struct Square<'a> {
-  height: u32,
-  width: u32,
+const PLAYER_HEIGHT: u32 = 150;
+const PLAYER_WIDTH: u32 = 20;
+const PLAYER_COLOR: Color = Color::RGB(255, 255, 255);
 
-  position: (i32, i32),
+pub trait Entity {
+  fn render(&self, canvas: &mut Canvas<Window>);
+}
+
+struct Square<'a> {
+  pub height: u32,
+  pub width: u32,
+
+  pub position: (i32, i32),
 
   color: Option<Color>,
   texture: Option<Texture<'a>>,
@@ -28,7 +36,7 @@ impl<'a> Square<'a> {
     }
   }
 
-  pub fn render(&self, canvas: &mut Canvas<Window>) {
+  pub fn draw_to_canvas(&self, canvas: &mut Canvas<Window>) {
     let (x, y) = self.position;
 
     let width = self.width;
@@ -66,13 +74,30 @@ impl<'a> Square<'a> {
       Err(_e) => self.texture = None,
     }
   }
+}
 
-  pub fn set_size(&mut self, height: u32, width: u32) {
-    self.height = height;
-    self.width = width;
+pub struct Player<'a> {
+  square: Square<'a>,
+}
+
+impl<'a> Player<'a> {
+  pub fn new(
+    canvas: &mut Canvas<Window>,
+    texture_creator: &'a TextureCreator<WindowContext>,
+  ) -> Player<'a> {
+    let mut square = Square::new(PLAYER_HEIGHT, PLAYER_WIDTH);
+    square.set_color(canvas, texture_creator, PLAYER_COLOR);
+
+    Player { square }
   }
 
   pub fn set_position(&mut self, x: i32, y: i32) {
-    self.position = (x, y);
+    self.square.position = (x, y);
+  }
+}
+
+impl Entity for Player<'_> {
+  fn render(&self, canvas: &mut Canvas<Window>) {
+    self.square.draw_to_canvas(canvas);
   }
 }

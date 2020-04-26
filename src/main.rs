@@ -11,7 +11,7 @@ use sdl2::pixels::Color;
 use sdl2::render::{Canvas, TextureCreator};
 use sdl2::video::{Window, WindowContext};
 
-use entities::Square;
+use entities::{Entity, Player};
 
 fn create_canvas(context: &sdl2::Sdl) -> Canvas<Window> {
   let video_subsystem = context.video().expect("Couldn't get SDL video subsystem");
@@ -41,13 +41,8 @@ pub fn main() {
     .event_pump()
     .expect("Failed to get SDL event pump");
 
-  let mut player = Square::new(150, 20);
-  player.set_color(&mut canvas, &texture_creator, Color::RGB(255, 255, 255));
+  let mut player = Player::new(&mut canvas, &texture_creator);
   player.set_position(0, 128);
-
-  let mut ball = Square::new(16, 16);
-  ball.set_color(&mut canvas, &texture_creator, Color::RGB(255, 255, 255));
-  ball.set_position(0, 0);
 
   'game: loop {
     for event in event_pump.poll_iter() {
@@ -65,7 +60,6 @@ pub fn main() {
     canvas.clear();
 
     player.render(&mut canvas);
-    ball.render(&mut canvas);
 
     canvas.present();
 
