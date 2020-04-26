@@ -124,16 +124,20 @@ impl Ball {
     self.size
   }
 
+  pub fn as_rect(&self) -> Rect {
+    let pos = self.position;
+    let (width, height) = self.size;
+
+    Rect::new(pos.x(), pos.y(), width, height)
+  }
+
   pub fn collides_with(&self, rect: Rect) -> bool {
-    let ball_x = self.position.x();
-    let ball_y = self.position.y();
+    let ball_rect = self.as_rect();
 
-    let (ball_width, ball_height) = self.size;
-
-    return ball_x < rect.x() + rect.width() as i32
-      && ball_x + ball_width as i32 > rect.x()
-      && ball_y < rect.y() + rect.height() as i32
-      && ball_y + ball_height as i32 > rect.y();
+    return ball_rect.x() < rect.x() + rect.width() as i32
+      && ball_rect.x() + ball_rect.width() as i32 > rect.x()
+      && ball_rect.y() < rect.y() + rect.height() as i32
+      && ball_rect.y() + ball_rect.height() as i32 > rect.y();
   }
 }
 
