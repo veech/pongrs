@@ -1,23 +1,28 @@
 extern crate sdl2;
-mod lib;
 
+use std::collections::HashSet;
 use std::thread::sleep;
 use std::time::Duration;
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
+use sdl2::keyboard::Scancode;
 use sdl2::pixels::Color;
 
 use sdl2::render::{Canvas, TextureCreator};
 use sdl2::video::{Window, WindowContext};
 
-use lib::entities::{Entity, Player};
+mod lib;
+use lib::entities::{Entity, GameState, Player};
+
+const VIEW_PORT_WIDTH: u32 = 800;
+const VIEW_PORT_HEIGHT: u32 = 600;
 
 fn create_canvas(context: &sdl2::Sdl) -> Canvas<Window> {
   let video_subsystem = context.video().expect("Couldn't get SDL video subsystem");
 
   let window = video_subsystem
-    .window("rust-sdl2 demo: Video", 800, 600)
+    .window("rust-sdl2 demo: Video", VIEW_PORT_WIDTH, VIEW_PORT_HEIGHT)
     .position_centered()
     .opengl()
     .build()
@@ -56,9 +61,18 @@ pub fn main() {
       }
     }
 
+    let keyboard_state: HashSet<Scancode> =
+      event_pump.keyboard_state().pressed_scancodes().collect();
+
+    let game_state = GameState {
+      view_port: (VIEW_PORT_HEIGHT, VIEW_PORT_WIDTH),
+      keyboard_state,
+    };
+
     canvas.set_draw_color(Color::RGB(0, 0, 0));
     canvas.clear();
 
+    player.update(game_state);
     player.render(&mut canvas);
 
     canvas.present();
