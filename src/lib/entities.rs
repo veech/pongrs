@@ -1,146 +1,135 @@
 use sdl2::pixels::Color;
-use sdl2::render::{Canvas, TextureCreator};
-use sdl2::video::{Window, WindowContext};
+use sdl2::rect::{Point, Rect};
+use sdl2::render::Canvas;
+use sdl2::video::Window;
 
-use super::shapes;
-use super::{Controls, GameState, Size, Vec2};
+use super::{Controls, GameState};
 
 const PLAYER_COLOR: Color = Color::RGB(255, 255, 255);
 const PLAYER_VELOCITY: i32 = 25;
-const PLAYER_SIZE: Size = Size {
-  height: 150,
-  width: 20,
-};
+const PLAYER_WIDTH: u32 = 20;
+const PLAYER_HEIGHT: u32 = 150;
 
 const BALL_COLOR: Color = Color::RGB(255, 255, 255);
 const BALL_INITIAL_VELOCITY: i32 = 5;
-const BALL_SIZE: Size = Size {
-  height: 16,
-  width: 16,
-};
+const BALL_SIZE: (u32, u32) = (16, 16);
 
 pub trait Entity {
   fn update(&mut self, game_state: &GameState);
   fn render(&self, canvas: &mut Canvas<Window>);
 }
 
-pub struct Player<'a> {
+pub struct Player {
+  size: (u32, u32),
+  color: Color,
+  position: Point,
+
   controls: Controls,
-
-  square: shapes::Square<'a>,
 }
 
-impl<'a> Player<'a> {
-  pub fn new(
-    canvas: &mut Canvas<Window>,
-    texture_creator: &'a TextureCreator<WindowContext>,
-    controls: Controls,
-  ) -> Player<'a> {
-    let mut square = shapes::Square::new(PLAYER_SIZE.height, PLAYER_SIZE.width);
-    square.set_color(canvas, texture_creator, PLAYER_COLOR);
+impl Player {
+  pub fn new(controls: Controls) -> Player {
+    Player {
+      color: PLAYER_COLOR,
+      position: Point::new(0, 0),
+      size: (PLAYER_WIDTH, PLAYER_HEIGHT),
 
-    Player { controls, square }
+      controls,
+    }
   }
 
-  pub fn position(&self) -> Vec2 {
-    self.square.position
+  pub fn set_position(&mut self, pos: (i32, i32)) {
+    let (x, y) = pos;
+    self.position = Point::new(x, y);
   }
 
-  pub fn size(&self) -> Size {
-    self.square.size
+  pub fn move_by(&mut self, delta: (i32, i32)) {
+    let (dx, dy) = delta;
+    let pos = self.position;
+
+    self.position = Point::new(pos.x + dx, pos.y + dy);
   }
 
-  pub fn set_position(&mut self, pos: Vec2) {
-    self.square.position = pos;
-  }
-
-  pub fn move_by(&mut self, delta: Vec2) {
-    let pos = self.square.position;
-    self.square.position = Vec2 {
-      x: pos.x + delta.x,
-      y: pos.y + delta.y,
-    };
+  pub fn size(&self) -> (u32, u32) {
+    self.size
   }
 }
 
-impl Entity for Player<'_> {
+impl Entity for Player {
   fn update(&mut self, game_state: &GameState) {
-    let view_port = &game_state.view_port;
+    let (_, view_height) = &game_state.view_port;
 
-    let pos = self.position();
-    let size = self.size();
+    let pos = self.position;
+    let (_, height) = self.size;
 
     if game_state.keyboard_state.contains(&self.controls.up) {
-      if (pos.y - PLAYER_VELOCITY) > 0 {
-        self.move_by(Vec2 { x: 0, y: -25 });
+      if (pos.y() - PLAYER_VELOCITY) > 0 {
+        self.move_by((0, -25));
       } else {
-        self.set_position(Vec2 { x: pos.x, y: 0 });
+        self.set_position((pos.x, 0));
       }
     }
 
     if game_state.keyboard_state.contains(&self.controls.down) {
-      if (pos.y + PLAYER_VELOCITY) < (view_port.height - size.height) as i32 {
-        self.move_by(Vec2 { x: 0, y: 25 });
+      if (pos.y() + PLAYER_VELOCITY) < (view_height - height) as i32 {
+        self.move_by((0, 25));
       } else {
-        self.set_position(Vec2 {
-          x: pos.x,
-          y: (view_port.height - size.height) as i32,
-        });
+        self.set_position((pos.x(), (view_height - height) as i32));
       }
     }
   }
 
   fn render(&self, canvas: &mut Canvas<Window>) {
-    self.square.draw_to_canvas(canvas);
+    let pos = self.position;
+    let (width, height) = self.size;
+
+    canvas.set_draw_color(self.color);
+    canvas
+      .fill_rect(Rect::new(pos.x(), pos.y(), width, height))
+      .expect("Unable to draw player to canvas");
   }
 }
 
-pub struct Ball<'a> {
-  square: shapes::Square<'a>,
-  velocity: Vec2,
+pub struct Ball {
+  size: (u32, u32),
+  color: Color,
+  position: Point,
+  velocity: Point,
 }
 
-impl<'a> Ball<'a> {
-  pub fn new(
-    canvas: &mut Canvas<Window>,
-    texture_creator: &'a TextureCreator<WindowContext>,
-  ) -> Ball<'a> {
-    let mut square = shapes::Square::new(BALL_SIZE.height, BALL_SIZE.width);
-    square.set_color(canvas, texture_creator, BALL_COLOR);
-
+impl Ball {
+  pub fn new() -> Ball {
     Ball {
-      square,
-      velocity: Vec2 {
-        x: BALL_INITIAL_VELOCITY,
-        y: BALL_INITIAL_VELOCITY,
-      },
+      position: Point::new(0, 0),
+      size: BALL_SIZE,
+      color: BALL_COLOR,
+
+      velocity: Point::new(BALL_INITIAL_VELOCITY, BALL_INITIAL_VELOCITY),
     }
   }
 
-  pub fn position(&self) -> Vec2 {
-    self.square.position
+  pub fn set_position(&mut self, pos: (i32, i32)) {
+    let (x, y) = pos;
+    self.position = Point::new(x, y);
   }
 
-  pub fn size(&self) -> Size {
-    self.square.size
-  }
-
-  pub fn set_position(&mut self, pos: Vec2) {
-    self.square.position = Vec2 { x: pos.x, y: pos.y };
+  pub fn size(&self) -> (u32, u32) {
+    self.size
   }
 }
 
-impl Entity for Ball<'_> {
+impl Entity for Ball {
   fn update(&mut self, game_state: &GameState) {
-    let pos = self.position();
+    let (view_width, view_height) = game_state.view_port;
+
+    let pos = self.position;
     let vel = self.velocity;
 
-    let new_pos = Vec2 {
-      x: pos.x + vel.x,
-      y: pos.y + vel.y,
-    };
+    let (width, height) = self.size;
 
-    if new_pos.x >= (game_state.view_port.width - self.size().width) as i32 {
+    let new_pos = Point::new(pos.x + vel.x, pos.y + vel.y);
+
+    if new_pos.x >= (view_width - width) as i32 {
       self.velocity.x = -vel.x
     };
 
@@ -148,7 +137,7 @@ impl Entity for Ball<'_> {
       self.velocity.x = -vel.x
     };
 
-    if new_pos.y >= (game_state.view_port.height - self.size().height) as i32 {
+    if new_pos.y >= (view_height - height) as i32 {
       self.velocity.y = -vel.y
     };
 
@@ -156,10 +145,16 @@ impl Entity for Ball<'_> {
       self.velocity.y = -vel.y
     };
 
-    self.square.position = new_pos;
+    self.position = new_pos;
   }
 
   fn render(&self, canvas: &mut Canvas<Window>) {
-    self.square.draw_to_canvas(canvas);
+    let pos = self.position;
+    let (width, height) = self.size;
+
+    canvas.set_draw_color(self.color);
+    canvas
+      .fill_rect(Rect::new(pos.x(), pos.y(), width, height))
+      .expect("Unable to draw ball to canvas");
   }
 }

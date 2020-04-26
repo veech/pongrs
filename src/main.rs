@@ -8,17 +8,14 @@ use sdl2::event::Event;
 use sdl2::keyboard::Scancode;
 use sdl2::pixels::Color;
 
-use sdl2::render::{Canvas, TextureCreator};
-use sdl2::video::{Window, WindowContext};
+use sdl2::render::Canvas;
+use sdl2::video::Window;
 
 mod lib;
 use lib::entities::{Ball, Entity, Player};
-use lib::{Controls, GameState, Size, Vec2};
+use lib::{Controls, GameState};
 
-const DEFAULT_VIEW_SIZE: Size = Size {
-  height: 600,
-  width: 800,
-};
+const DEFAULT_VIEW_SIZE: (u32, u32) = (800, 600);
 
 const PLAYER_1_CONTROLS: Controls = Controls {
   up: Scancode::W,
@@ -34,7 +31,7 @@ fn create_canvas(context: &sdl2::Sdl) -> Canvas<Window> {
   let video_subsystem = context.video().expect("Couldn't get SDL video subsystem");
 
   let window = video_subsystem
-    .window("pongrs", DEFAULT_VIEW_SIZE.width, DEFAULT_VIEW_SIZE.height)
+    .window("pongrs", DEFAULT_VIEW_SIZE.0, DEFAULT_VIEW_SIZE.1)
     .position_centered()
     .opengl()
     .build()
@@ -52,32 +49,26 @@ pub fn main() {
   let sdl_context = sdl2::init().expect("SDL initialization failed");
 
   let mut canvas = create_canvas(&sdl_context);
-  let texture_creator: TextureCreator<WindowContext> = canvas.texture_creator();
 
   let mut event_pump = sdl_context
     .event_pump()
     .expect("Failed to get SDL event pump");
 
   let (view_width, view_height) = canvas.window().drawable_size();
-  let view_port = Size {
-    height: view_height,
-    width: view_width,
-  };
+  let view_port = (view_width, view_height);
 
-  let mut player1 = Player::new(&mut canvas, &texture_creator, PLAYER_1_CONTROLS);
-  player1.set_position(Vec2 { x: 0, y: 128 });
+  let mut player1 = Player::new(PLAYER_1_CONTROLS);
+  player1.set_position((0, 128));
 
-  let mut player2 = Player::new(&mut canvas, &texture_creator, PLAYER_2_CONTROLS);
-  player2.set_position(Vec2 {
-    x: (view_port.width - player2.size().width) as i32,
-    y: 128,
-  });
+  let mut player2 = Player::new(PLAYER_2_CONTROLS);
+  player2.set_position(((view_width - player2.size().0) as i32, 128));
 
-  let mut ball = Ball::new(&mut canvas, &texture_creator);
-  ball.set_position(Vec2 {
-    x: ((view_port.width / 2) - (ball.size().width / 2)) as i32,
-    y: ((view_port.height / 2) - (ball.size().height / 2)) as i32,
-  });
+  let mut ball = Ball::new();
+  let (ball_width, ball_height) = ball.size();
+  ball.set_position((
+    ((view_width / 2) - (ball_width / 2)) as i32,
+    ((view_height / 2) - (ball_height / 2)) as i32,
+  ));
 
   let mut entities: Vec<&mut dyn Entity> = vec![&mut player1, &mut player2, &mut ball];
 
