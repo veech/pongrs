@@ -47,10 +47,7 @@ impl<'a> Player<'a> {
   }
 
   pub fn size(&self) -> Size {
-    Size {
-      height: self.square.height,
-      width: self.square.width,
-    }
+    self.square.size
   }
 
   pub fn set_position(&mut self, x: i32, y: i32) {
@@ -69,7 +66,9 @@ impl<'a> Player<'a> {
 impl Entity for Player<'_> {
   fn update(&mut self, game_state: &GameState) {
     let view_port = &game_state.view_port;
+
     let pos = self.position();
+    let size = self.size();
 
     if game_state.keyboard_state.contains(&self.controls.up) {
       if (pos.y - PLAYER_VELOCITY) > 0 {
@@ -80,10 +79,10 @@ impl Entity for Player<'_> {
     }
 
     if game_state.keyboard_state.contains(&self.controls.down) {
-      if (pos.y + PLAYER_VELOCITY) < (view_port.height - self.square.height) as i32 {
+      if (pos.y + PLAYER_VELOCITY) < (view_port.height - size.height) as i32 {
         self.move_by(0, 25);
       } else {
-        self.set_position(pos.x, (view_port.height - self.square.height) as i32);
+        self.set_position(pos.x, (view_port.height - size.height) as i32);
       }
     }
   }
@@ -120,10 +119,7 @@ impl<'a> Ball<'a> {
   }
 
   pub fn size(&self) -> Size {
-    Size {
-      height: self.square.height,
-      width: self.square.width,
-    }
+    self.square.size
   }
 
   pub fn set_position(&mut self, pos: Vec2) {

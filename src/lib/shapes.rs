@@ -3,14 +3,12 @@ use sdl2::rect::Rect;
 use sdl2::render::{Canvas, Texture, TextureCreator};
 use sdl2::video::{Window, WindowContext};
 
-use super::Vec2;
+use super::{Size, Vec2};
 
 const DEFAULT_POSITION: Vec2 = Vec2 { x: 0, y: 0 };
 
 pub struct Square<'a> {
-  pub height: u32,
-  pub width: u32,
-
+  pub size: Size,
   pub position: Vec2,
 
   color: Option<Color>,
@@ -20,9 +18,7 @@ pub struct Square<'a> {
 impl<'a> Square<'a> {
   pub fn new(height: u32, width: u32) -> Square<'a> {
     Square {
-      height,
-      width,
-
+      size: Size { height, width },
       position: DEFAULT_POSITION,
 
       color: None,
@@ -31,10 +27,11 @@ impl<'a> Square<'a> {
   }
 
   pub fn draw_to_canvas(&self, canvas: &mut Canvas<Window>) {
-    let pos = &self.position;
+    let pos = self.position;
+    let size = self.size;
 
-    let width = self.width;
-    let height = self.height;
+    let width = size.width;
+    let height = size.height;
 
     match &self.texture {
       Some(texture) => {
@@ -54,7 +51,7 @@ impl<'a> Square<'a> {
   ) {
     self.color = Some(color);
 
-    match texture_creator.create_texture_target(None, self.width, self.height) {
+    match texture_creator.create_texture_target(None, self.size.width, self.size.height) {
       Ok(mut square_texture) => {
         canvas
           .with_texture_canvas(&mut square_texture, |texture| {
