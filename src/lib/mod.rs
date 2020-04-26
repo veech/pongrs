@@ -1,5 +1,7 @@
-use sdl2::keyboard::Scancode;
 use std::collections::HashSet;
+
+use sdl2::keyboard::Scancode;
+use sdl2::rect::Rect;
 
 pub mod entities;
 
@@ -12,4 +14,5 @@ pub struct Controls {
 pub struct GameState {
   pub view_port: (u32, u32),
   pub keyboard_state: HashSet<Scancode>,
+  pub player_rects: Vec<Rect>,
 }

@@ -70,8 +70,6 @@ pub fn main() {
     ((view_height / 2) - (ball_height / 2)) as i32,
   ));
 
-  let mut entities: Vec<&mut dyn Entity> = vec![&mut player1, &mut player2, &mut ball];
-
   'game: loop {
     for event in event_pump.poll_iter() {
       match event {
@@ -90,18 +88,19 @@ pub fn main() {
     let game_state = GameState {
       view_port,
       keyboard_state,
+      player_rects: vec![player1.as_rect(), player2.as_rect()],
     };
 
     canvas.set_draw_color(Color::RGB(0, 0, 0));
     canvas.clear();
 
-    for entity in &mut entities {
-      entity.update(&game_state);
-    }
+    player1.update(&game_state);
+    player2.update(&game_state);
+    ball.update(&game_state);
 
-    for entity in &entities {
-      entity.render(&mut canvas);
-    }
+    player1.render(&mut canvas);
+    player2.render(&mut canvas);
+    ball.render(&mut canvas);
 
     canvas.present();
 

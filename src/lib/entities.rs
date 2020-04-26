@@ -53,6 +53,13 @@ impl Player {
   pub fn size(&self) -> (u32, u32) {
     self.size
   }
+
+  pub fn as_rect(&self) -> Rect {
+    let pos = self.position;
+    let (width, height) = self.size;
+
+    Rect::new(pos.x(), pos.y(), width, height)
+  }
 }
 
 impl Entity for Player {
@@ -116,6 +123,21 @@ impl Ball {
   pub fn size(&self) -> (u32, u32) {
     self.size
   }
+
+  pub fn collides_with(&self, rect: Rect) {
+    let ball_x = self.position.x();
+    let ball_y = self.position.y();
+
+    let (ball_width, ball_height) = self.size;
+
+    if ball_x < rect.x() + rect.width() as i32
+      && ball_x + ball_width as i32 > rect.x()
+      && ball_y < rect.y() + rect.height() as i32
+      && ball_y + ball_height as i32 > rect.y()
+    {
+      println!("Collision!");
+    }
+  }
 }
 
 impl Entity for Ball {
@@ -146,6 +168,10 @@ impl Entity for Ball {
     };
 
     self.position = new_pos;
+
+    for rect in game_state.player_rects.iter() {
+      self.collides_with(*rect);
+    }
   }
 
   fn render(&self, canvas: &mut Canvas<Window>) {
