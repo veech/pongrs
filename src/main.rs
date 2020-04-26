@@ -68,10 +68,6 @@ pub fn main() {
   'game: loop {
     for event in event_pump.poll_iter() {
       match event {
-        Event::KeyDown {
-          keycode: Some(Keycode::Escape),
-          ..
-        } => break 'game,
         Event::Quit { .. } => break 'game,
         _ => {}
       }
@@ -79,6 +75,10 @@ pub fn main() {
 
     let keyboard_state: HashSet<Scancode> =
       event_pump.keyboard_state().pressed_scancodes().collect();
+
+    if keyboard_state.contains(&Scancode::Escape) {
+      break 'game;
+    }
 
     let game_state = GameState {
       view_port: VIEW_SIZE,
