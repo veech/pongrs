@@ -34,11 +34,7 @@ fn create_canvas(context: &sdl2::Sdl) -> Canvas<Window> {
   let video_subsystem = context.video().expect("Couldn't get SDL video subsystem");
 
   let window = video_subsystem
-    .window(
-      "rust-sdl2 demo: Video",
-      DEFAULT_VIEW_SIZE.width,
-      DEFAULT_VIEW_SIZE.height,
-    )
+    .window("pongrs", DEFAULT_VIEW_SIZE.width, DEFAULT_VIEW_SIZE.height)
     .position_centered()
     .opengl()
     .build()
