@@ -3,7 +3,7 @@ use sdl2::render::{Canvas, TextureCreator};
 use sdl2::video::{Window, WindowContext};
 
 use super::shapes;
-use super::{Controls, GameState, Size};
+use super::{Controls, GameState, Size, Vec2};
 
 const PLAYER_COLOR: Color = Color::RGB(255, 255, 255);
 const PLAYER_VELOCITY: i32 = 25;
@@ -42,7 +42,7 @@ impl<'a> Player<'a> {
     Player { controls, square }
   }
 
-  pub fn position(&self) -> (i32, i32) {
+  pub fn position(&self) -> Vec2 {
     self.square.position
   }
 
@@ -54,33 +54,36 @@ impl<'a> Player<'a> {
   }
 
   pub fn set_position(&mut self, x: i32, y: i32) {
-    self.square.position = (x, y);
+    self.square.position = Vec2 { x, y };
   }
 
   pub fn move_by(&mut self, dx: i32, dy: i32) {
-    let (x, y) = self.square.position;
-    self.square.position = (x + dx, y + dy);
+    let pos = self.square.position;
+    self.square.position = Vec2 {
+      x: pos.x + dx,
+      y: pos.y + dy,
+    };
   }
 }
 
 impl Entity for Player<'_> {
   fn update(&mut self, game_state: &GameState) {
     let view_port = &game_state.view_port;
-    let (x, y) = self.position();
+    let pos = self.position();
 
     if game_state.keyboard_state.contains(&self.controls.up) {
-      if (y - PLAYER_VELOCITY) > 0 {
+      if (pos.y - PLAYER_VELOCITY) > 0 {
         self.move_by(0, -25);
       } else {
-        self.set_position(x, 0);
+        self.set_position(pos.x, 0);
       }
     }
 
     if game_state.keyboard_state.contains(&self.controls.down) {
-      if (y + PLAYER_VELOCITY) < (view_port.height - self.square.height) as i32 {
+      if (pos.y + PLAYER_VELOCITY) < (view_port.height - self.square.height) as i32 {
         self.move_by(0, 25);
       } else {
-        self.set_position(x, (view_port.height - self.square.height) as i32);
+        self.set_position(pos.x, (view_port.height - self.square.height) as i32);
       }
     }
   }
@@ -109,7 +112,7 @@ impl<'a> Ball<'a> {
     }
   }
 
-  pub fn position(&self) -> (i32, i32) {
+  pub fn position(&self) -> Vec2 {
     self.square.position
   }
 
@@ -120,31 +123,34 @@ impl<'a> Ball<'a> {
     }
   }
 
-  pub fn set_position(&mut self, x: i32, y: i32) {
-    self.square.position = (x, y);
+  pub fn set_position(&mut self, pos: Vec2) {
+    self.square.position = Vec2 { x: pos.x, y: pos.y };
   }
 }
 
 impl Entity for Ball<'_> {
   fn update(&mut self, game_state: &GameState) {
-    let (x, y) = self.position();
+    let pos = self.position();
     let (dx, dy) = self.velocity;
 
-    let new_pos = (x + dx, y + dy);
+    let new_pos = Vec2 {
+      x: pos.x + dx,
+      y: pos.y + dy,
+    };
 
-    if new_pos.0 >= (game_state.view_port.width - self.size().width) as i32 {
+    if new_pos.x >= (game_state.view_port.width - self.size().width) as i32 {
       self.velocity.0 = -self.velocity.0
     };
 
-    if new_pos.0 <= 0 as i32 {
+    if new_pos.x <= 0 as i32 {
       self.velocity.0 = -self.velocity.0
     };
 
-    if new_pos.1 >= (game_state.view_port.height - self.size().height) as i32 {
+    if new_pos.y >= (game_state.view_port.height - self.size().height) as i32 {
       self.velocity.1 = -self.velocity.1
     };
 
-    if new_pos.1 <= 0 as i32 {
+    if new_pos.y <= 0 as i32 {
       self.velocity.1 = -self.velocity.1
     };
 

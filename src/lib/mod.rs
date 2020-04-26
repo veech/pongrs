@@ -10,6 +10,12 @@ pub struct Size {
   pub width: u32,
 }
 
+#[derive(Debug, Copy, Clone)]
+pub struct Vec2 {
+  pub x: i32,
+  pub y: i32,
+}
+
 #[derive(Debug)]
 pub struct GameState {
   // TODO: use a more descriptive type than a touple

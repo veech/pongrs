@@ -3,13 +3,15 @@ use sdl2::rect::Rect;
 use sdl2::render::{Canvas, Texture, TextureCreator};
 use sdl2::video::{Window, WindowContext};
 
-const DEFAULT_POSITION: (i32, i32) = (0, 0);
+use super::Vec2;
+
+const DEFAULT_POSITION: Vec2 = Vec2 { x: 0, y: 0 };
 
 pub struct Square<'a> {
   pub height: u32,
   pub width: u32,
 
-  pub position: (i32, i32),
+  pub position: Vec2,
 
   color: Option<Color>,
   texture: Option<Texture<'a>>,
@@ -29,7 +31,7 @@ impl<'a> Square<'a> {
   }
 
   pub fn draw_to_canvas(&self, canvas: &mut Canvas<Window>) {
-    let (x, y) = self.position;
+    let pos = &self.position;
 
     let width = self.width;
     let height = self.height;
@@ -37,7 +39,7 @@ impl<'a> Square<'a> {
     match &self.texture {
       Some(texture) => {
         canvas
-          .copy(&texture, None, Rect::new(x, y, width, height))
+          .copy(&texture, None, Rect::new(pos.x, pos.y, width, height))
           .expect("Could not copy texture into window");
       }
       None => println!("Cannot render square without color"),
