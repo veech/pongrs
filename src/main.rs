@@ -12,7 +12,8 @@ use sdl2::render::{Canvas, TextureCreator};
 use sdl2::video::{Window, WindowContext};
 
 mod lib;
-use lib::entities::{Controls, Entity, GameState, Player};
+use lib::entities::{Ball, Player};
+use lib::entities::{Controls, Entity, GameState};
 use lib::Size;
 
 const DEFAULT_VIEW_SIZE: Size = Size {
@@ -70,6 +71,12 @@ pub fn main() {
   let mut player2 = Player::new(&mut canvas, &texture_creator, PLAYER_2_CONTROLS);
   player2.set_position((view_port.width - player2.size().width) as i32, 128);
 
+  let mut ball = Ball::new(&mut canvas, &texture_creator);
+  ball.set_position(
+    ((view_port.width / 2) - (ball.size().width / 2)) as i32,
+    ((view_port.height / 2) - (ball.size().height / 2)) as i32,
+  );
+
   'game: loop {
     for event in event_pump.poll_iter() {
       match event {
@@ -95,9 +102,11 @@ pub fn main() {
 
     player1.update(&game_state);
     player2.update(&game_state);
+    ball.update(&game_state);
 
     player1.render(&mut canvas);
     player2.render(&mut canvas);
+    ball.render(&mut canvas);
 
     canvas.present();
 
