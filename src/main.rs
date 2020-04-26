@@ -11,7 +11,7 @@ use sdl2::pixels::Color;
 use sdl2::render::{Canvas, TextureCreator};
 use sdl2::video::{Window, WindowContext};
 
-use lib::{Entity, Player};
+use lib::entities::{Entity, Player};
 
 fn create_canvas(context: &sdl2::Sdl) -> Canvas<Window> {
   let video_subsystem = context.video().expect("Couldn't get SDL video subsystem");
