@@ -95,7 +95,7 @@ impl Entity for Player<'_> {
 
 pub struct Ball<'a> {
   square: shapes::Square<'a>,
-  velocity: (i32, i32),
+  velocity: Vec2,
 }
 
 impl<'a> Ball<'a> {
@@ -108,7 +108,10 @@ impl<'a> Ball<'a> {
 
     Ball {
       square,
-      velocity: (BALL_INITIAL_VELOCITY, BALL_INITIAL_VELOCITY),
+      velocity: Vec2 {
+        x: BALL_INITIAL_VELOCITY,
+        y: BALL_INITIAL_VELOCITY,
+      },
     }
   }
 
@@ -131,27 +134,27 @@ impl<'a> Ball<'a> {
 impl Entity for Ball<'_> {
   fn update(&mut self, game_state: &GameState) {
     let pos = self.position();
-    let (dx, dy) = self.velocity;
+    let vel = self.velocity;
 
     let new_pos = Vec2 {
-      x: pos.x + dx,
-      y: pos.y + dy,
+      x: pos.x + vel.x,
+      y: pos.y + vel.y,
     };
 
     if new_pos.x >= (game_state.view_port.width - self.size().width) as i32 {
-      self.velocity.0 = -self.velocity.0
+      self.velocity.x = -vel.x
     };
 
     if new_pos.x <= 0 as i32 {
-      self.velocity.0 = -self.velocity.0
+      self.velocity.x = -vel.x
     };
 
     if new_pos.y >= (game_state.view_port.height - self.size().height) as i32 {
-      self.velocity.1 = -self.velocity.1
+      self.velocity.y = -vel.y
     };
 
     if new_pos.y <= 0 as i32 {
-      self.velocity.1 = -self.velocity.1
+      self.velocity.y = -vel.y
     };
 
     self.square.position = new_pos;
