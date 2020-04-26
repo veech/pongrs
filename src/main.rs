@@ -13,16 +13,29 @@ use sdl2::render::{Canvas, TextureCreator};
 use sdl2::video::{Window, WindowContext};
 
 mod lib;
-use lib::entities::{Entity, GameState, Player};
+use lib::entities::{Controls, Entity, GameState, Player};
+use lib::Size;
 
-const VIEW_PORT_WIDTH: u32 = 800;
-const VIEW_PORT_HEIGHT: u32 = 600;
+const VIEW_SIZE: Size = Size {
+  height: 600,
+  width: 800,
+};
+
+const PLAYER_1_CONTROLS: Controls = Controls {
+  up: Scancode::W,
+  down: Scancode::S,
+};
+
+const PLAYER_2_CONTROLS: Controls = Controls {
+  up: Scancode::Up,
+  down: Scancode::Down,
+};
 
 fn create_canvas(context: &sdl2::Sdl) -> Canvas<Window> {
   let video_subsystem = context.video().expect("Couldn't get SDL video subsystem");
 
   let window = video_subsystem
-    .window("rust-sdl2 demo: Video", VIEW_PORT_WIDTH, VIEW_PORT_HEIGHT)
+    .window("rust-sdl2 demo: Video", VIEW_SIZE.width, VIEW_SIZE.height)
     .position_centered()
     .opengl()
     .build()
@@ -46,8 +59,11 @@ pub fn main() {
     .event_pump()
     .expect("Failed to get SDL event pump");
 
-  let mut player = Player::new(&mut canvas, &texture_creator);
-  player.set_position(0, 128);
+  let mut player1 = Player::new(&mut canvas, &texture_creator, PLAYER_1_CONTROLS);
+  player1.set_position(0, 128);
+
+  let mut player2 = Player::new(&mut canvas, &texture_creator, PLAYER_2_CONTROLS);
+  player2.set_position(((VIEW_SIZE.width * 2) - player2.size().width) as i32, 128);
 
   'game: loop {
     for event in event_pump.poll_iter() {
@@ -65,15 +81,18 @@ pub fn main() {
       event_pump.keyboard_state().pressed_scancodes().collect();
 
     let game_state = GameState {
-      view_port: (VIEW_PORT_HEIGHT, VIEW_PORT_WIDTH),
+      view_port: VIEW_SIZE,
       keyboard_state,
     };
 
     canvas.set_draw_color(Color::RGB(0, 0, 0));
     canvas.clear();
 
-    player.update(game_state);
-    player.render(&mut canvas);
+    player1.update(&game_state);
+    player2.update(&game_state);
+
+    player1.render(&mut canvas);
+    player2.render(&mut canvas);
 
     canvas.present();
 
