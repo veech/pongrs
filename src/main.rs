@@ -65,10 +65,13 @@ pub fn main() {
   };
 
   let mut player1 = Player::new(&mut canvas, &texture_creator, PLAYER_1_CONTROLS);
-  player1.set_position(0, 128);
+  player1.set_position(Vec2 { x: 0, y: 128 });
 
   let mut player2 = Player::new(&mut canvas, &texture_creator, PLAYER_2_CONTROLS);
-  player2.set_position((view_port.width - player2.size().width) as i32, 128);
+  player2.set_position(Vec2 {
+    x: (view_port.width - player2.size().width) as i32,
+    y: 128,
+  });
 
   let mut ball = Ball::new(&mut canvas, &texture_creator);
   ball.set_position(Vec2 {

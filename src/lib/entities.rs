@@ -50,15 +50,15 @@ impl<'a> Player<'a> {
     self.square.size
   }
 
-  pub fn set_position(&mut self, x: i32, y: i32) {
-    self.square.position = Vec2 { x, y };
+  pub fn set_position(&mut self, pos: Vec2) {
+    self.square.position = pos;
   }
 
-  pub fn move_by(&mut self, dx: i32, dy: i32) {
+  pub fn move_by(&mut self, delta: Vec2) {
     let pos = self.square.position;
     self.square.position = Vec2 {
-      x: pos.x + dx,
-      y: pos.y + dy,
+      x: pos.x + delta.x,
+      y: pos.y + delta.y,
     };
   }
 }
@@ -72,17 +72,20 @@ impl Entity for Player<'_> {
 
     if game_state.keyboard_state.contains(&self.controls.up) {
       if (pos.y - PLAYER_VELOCITY) > 0 {
-        self.move_by(0, -25);
+        self.move_by(Vec2 { x: 0, y: -25 });
       } else {
-        self.set_position(pos.x, 0);
+        self.set_position(Vec2 { x: pos.x, y: 0 });
       }
     }
 
     if game_state.keyboard_state.contains(&self.controls.down) {
       if (pos.y + PLAYER_VELOCITY) < (view_port.height - size.height) as i32 {
-        self.move_by(0, 25);
+        self.move_by(Vec2 { x: 0, y: 25 });
       } else {
-        self.set_position(pos.x, (view_port.height - size.height) as i32);
+        self.set_position(Vec2 {
+          x: pos.x,
+          y: (view_port.height - size.height) as i32,
+        });
       }
     }
   }
