@@ -26,23 +26,6 @@ impl<'a> Square<'a> {
     }
   }
 
-  pub fn draw_to_canvas(&self, canvas: &mut Canvas<Window>) {
-    let pos = self.position;
-    let size = self.size;
-
-    let width = size.width;
-    let height = size.height;
-
-    match &self.texture {
-      Some(texture) => {
-        canvas
-          .copy(&texture, None, Rect::new(pos.x, pos.y, width, height))
-          .expect("Could not copy texture into window");
-      }
-      None => println!("Cannot render square without color"),
-    }
-  }
-
   pub fn set_color(
     &mut self,
     canvas: &mut Canvas<Window>,
@@ -63,6 +46,23 @@ impl<'a> Square<'a> {
         self.texture = Some(square_texture);
       }
       Err(_e) => self.texture = None,
+    }
+  }
+
+  pub fn draw_to_canvas(&self, canvas: &mut Canvas<Window>) {
+    let pos = self.position;
+    let size = self.size;
+
+    let width = size.width;
+    let height = size.height;
+
+    match &self.texture {
+      Some(texture) => {
+        canvas
+          .copy(&texture, None, Rect::new(pos.x, pos.y, width, height))
+          .expect("Could not copy texture into window");
+      }
+      None => println!("Cannot render square without color"),
     }
   }
 }
