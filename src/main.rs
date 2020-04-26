@@ -5,7 +5,6 @@ use std::thread::sleep;
 use std::time::Duration;
 
 use sdl2::event::Event;
-use sdl2::keyboard::Keycode;
 use sdl2::keyboard::Scancode;
 use sdl2::pixels::Color;
 
@@ -16,7 +15,7 @@ mod lib;
 use lib::entities::{Controls, Entity, GameState, Player};
 use lib::Size;
 
-const VIEW_SIZE: Size = Size {
+const DEFAULT_VIEW_SIZE: Size = Size {
   height: 600,
   width: 800,
 };
@@ -35,7 +34,11 @@ fn create_canvas(context: &sdl2::Sdl) -> Canvas<Window> {
   let video_subsystem = context.video().expect("Couldn't get SDL video subsystem");
 
   let window = video_subsystem
-    .window("rust-sdl2 demo: Video", VIEW_SIZE.width, VIEW_SIZE.height)
+    .window(
+      "rust-sdl2 demo: Video",
+      DEFAULT_VIEW_SIZE.width,
+      DEFAULT_VIEW_SIZE.height,
+    )
     .position_centered()
     .opengl()
     .build()
@@ -59,11 +62,17 @@ pub fn main() {
     .event_pump()
     .expect("Failed to get SDL event pump");
 
+  let (view_width, view_height) = canvas.window().drawable_size();
+  let view_port = Size {
+    height: view_height,
+    width: view_width,
+  };
+
   let mut player1 = Player::new(&mut canvas, &texture_creator, PLAYER_1_CONTROLS);
   player1.set_position(0, 128);
 
   let mut player2 = Player::new(&mut canvas, &texture_creator, PLAYER_2_CONTROLS);
-  player2.set_position(((VIEW_SIZE.width * 2) - player2.size().width) as i32, 128);
+  player2.set_position((view_port.width - player2.size().width) as i32, 128);
 
   'game: loop {
     for event in event_pump.poll_iter() {
@@ -81,7 +90,7 @@ pub fn main() {
     }
 
     let game_state = GameState {
-      view_port: VIEW_SIZE,
+      view_port,
       keyboard_state,
     };
 

@@ -83,10 +83,10 @@ impl Entity for Player<'_> {
     }
 
     if game_state.keyboard_state.contains(&self.controls.down) {
-      if (y + PLAYER_VELOCITY) < ((view_port.height * 2) - self.square.height) as i32 {
+      if (y + PLAYER_VELOCITY) < (view_port.height - self.square.height) as i32 {
         self.move_by(0, 25);
       } else {
-        self.set_position(x, ((view_port.height * 2) - self.square.height) as i32);
+        self.set_position(x, (view_port.height - self.square.height) as i32);
       }
     }
   }
