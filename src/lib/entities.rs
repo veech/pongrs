@@ -124,19 +124,16 @@ impl Ball {
     self.size
   }
 
-  pub fn collides_with(&self, rect: Rect) {
+  pub fn collides_with(&self, rect: Rect) -> bool {
     let ball_x = self.position.x();
     let ball_y = self.position.y();
 
     let (ball_width, ball_height) = self.size;
 
-    if ball_x < rect.x() + rect.width() as i32
+    return ball_x < rect.x() + rect.width() as i32
       && ball_x + ball_width as i32 > rect.x()
       && ball_y < rect.y() + rect.height() as i32
-      && ball_y + ball_height as i32 > rect.y()
-    {
-      println!("Collision!");
-    }
+      && ball_y + ball_height as i32 > rect.y();
   }
 }
 
@@ -149,29 +146,22 @@ impl Entity for Ball {
 
     let (width, height) = self.size;
 
-    let new_pos = Point::new(pos.x + vel.x, pos.y + vel.y);
-
-    if new_pos.x >= (view_width - width) as i32 {
-      self.velocity.x = -vel.x
-    };
-
-    if new_pos.x <= 0 as i32 {
-      self.velocity.x = -vel.x
-    };
-
-    if new_pos.y >= (view_height - height) as i32 {
-      self.velocity.y = -vel.y
-    };
-
-    if new_pos.y <= 0 as i32 {
-      self.velocity.y = -vel.y
-    };
-
-    self.position = new_pos;
+    self.position = Point::new(pos.x + vel.x, pos.y + vel.y);
 
     for rect in game_state.player_rects.iter() {
-      self.collides_with(*rect);
+      if self.collides_with(*rect) {
+        self.velocity.x = -vel.x;
+      }
     }
+
+    if self.position.x() >= (view_width - width) as i32 || self.position.x() <= 0 as i32 {
+      self.velocity.x = -vel.x;
+      println!("Point");
+    };
+
+    if self.position.y() >= (view_height - height) as i32 || self.position.y() <= 0 as i32 {
+      self.velocity.y = -vel.y;
+    };
   }
 
   fn render(&self, canvas: &mut Canvas<Window>) {
