@@ -1,12 +1,9 @@
-use std::collections::HashSet;
-
-use sdl2::keyboard::Scancode;
 use sdl2::pixels::Color;
 use sdl2::render::{Canvas, TextureCreator};
 use sdl2::video::{Window, WindowContext};
 
 use super::shapes;
-use super::Size;
+use super::{Controls, GameState, Size};
 
 const PLAYER_COLOR: Color = Color::RGB(255, 255, 255);
 const PLAYER_VELOCITY: i32 = 25;
@@ -21,18 +18,6 @@ const BALL_SIZE: Size = Size {
   height: 16,
   width: 16,
 };
-
-#[derive(Debug)]
-pub struct GameState {
-  // TODO: use a more descriptive type than a touple
-  pub view_port: Size,
-  pub keyboard_state: HashSet<Scancode>,
-}
-
-pub struct Controls {
-  pub up: Scancode,
-  pub down: Scancode,
-}
 
 pub trait Entity {
   fn update(&mut self, game_state: &GameState);

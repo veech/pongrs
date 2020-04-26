@@ -12,9 +12,8 @@ use sdl2::render::{Canvas, TextureCreator};
 use sdl2::video::{Window, WindowContext};
 
 mod lib;
-use lib::entities::{Ball, Player};
-use lib::entities::{Controls, Entity, GameState};
-use lib::Size;
+use lib::entities::{Ball, Entity, Player};
+use lib::{Controls, GameState, Size};
 
 const DEFAULT_VIEW_SIZE: Size = Size {
   height: 600,
