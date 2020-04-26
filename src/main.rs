@@ -70,6 +70,13 @@ pub fn main() {
     ((view_height / 2) - (ball_height / 2)) as i32,
   ));
 
+  let mut game_state = GameState {
+    view_port,
+    keyboard_state: HashSet::new(),
+    player_rects: Vec::new(),
+    player_points: (0, 0),
+  };
+
   'game: loop {
     for event in event_pump.poll_iter() {
       match event {
@@ -78,25 +85,19 @@ pub fn main() {
       }
     }
 
-    let keyboard_state: HashSet<Scancode> =
-      event_pump.keyboard_state().pressed_scancodes().collect();
+    game_state.keyboard_state = event_pump.keyboard_state().pressed_scancodes().collect();
+    game_state.player_rects = vec![player1.as_rect(), player2.as_rect()];
 
-    if keyboard_state.contains(&Scancode::Escape) {
+    if game_state.keyboard_state.contains(&Scancode::Escape) {
       break 'game;
     }
-
-    let game_state = GameState {
-      view_port,
-      keyboard_state,
-      player_rects: vec![player1.as_rect(), player2.as_rect()],
-    };
 
     canvas.set_draw_color(Color::RGB(0, 0, 0));
     canvas.clear();
 
-    player1.update(&game_state);
-    player2.update(&game_state);
-    ball.update(&game_state);
+    player1.update(&mut game_state);
+    player2.update(&mut game_state);
+    ball.update(&mut game_state);
 
     player1.render(&mut canvas);
     player2.render(&mut canvas);

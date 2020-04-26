@@ -15,7 +15,7 @@ const BALL_INITIAL_VELOCITY: i32 = 5;
 const BALL_SIZE: (u32, u32) = (16, 16);
 
 pub trait Entity {
-  fn update(&mut self, game_state: &GameState);
+  fn update(&mut self, game_state: &mut GameState);
   fn render(&self, canvas: &mut Canvas<Window>);
 }
 
@@ -63,7 +63,7 @@ impl Player {
 }
 
 impl Entity for Player {
-  fn update(&mut self, game_state: &GameState) {
+  fn update(&mut self, game_state: &mut GameState) {
     let (_, view_height) = &game_state.view_port;
 
     let pos = self.position;
@@ -87,12 +87,9 @@ impl Entity for Player {
   }
 
   fn render(&self, canvas: &mut Canvas<Window>) {
-    let pos = self.position;
-    let (width, height) = self.size;
-
     canvas.set_draw_color(self.color);
     canvas
-      .fill_rect(Rect::new(pos.x(), pos.y(), width, height))
+      .fill_rect(self.as_rect())
       .expect("Unable to draw player to canvas");
   }
 }
@@ -142,7 +139,7 @@ impl Ball {
 }
 
 impl Entity for Ball {
-  fn update(&mut self, game_state: &GameState) {
+  fn update(&mut self, game_state: &mut GameState) {
     let (view_width, view_height) = game_state.view_port;
 
     let pos = self.position;
@@ -158,9 +155,18 @@ impl Entity for Ball {
       }
     }
 
-    if self.position.x() >= (view_width - width) as i32 || self.position.x() <= 0 as i32 {
+    if self.position.x() >= (view_width - width) as i32 {
+      let (p1_points, p2_points) = game_state.player_points;
+      game_state.player_points = (p1_points + 1, p2_points);
+
       self.velocity.x = -vel.x;
-      println!("Point");
+    };
+
+    if self.position.x() <= 0 as i32 {
+      let (p1_points, p2_points) = game_state.player_points;
+      game_state.player_points = (p1_points, p2_points + 1);
+
+      self.velocity.x = -vel.x;
     };
 
     if self.position.y() >= (view_height - height) as i32 || self.position.y() <= 0 as i32 {
@@ -169,12 +175,9 @@ impl Entity for Ball {
   }
 
   fn render(&self, canvas: &mut Canvas<Window>) {
-    let pos = self.position;
-    let (width, height) = self.size;
-
     canvas.set_draw_color(self.color);
     canvas
-      .fill_rect(Rect::new(pos.x(), pos.y(), width, height))
+      .fill_rect(self.as_rect())
       .expect("Unable to draw ball to canvas");
   }
 }
