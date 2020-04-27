@@ -7,6 +7,7 @@ use std::time::Duration;
 use sdl2::event::Event;
 use sdl2::keyboard::Scancode;
 use sdl2::pixels::Color;
+use sdl2::rect::Point;
 
 use sdl2::render::Canvas;
 use sdl2::video::Window;
@@ -16,6 +17,8 @@ use lib::entities::{Ball, Entity, Player};
 use lib::{Controls, GameState};
 
 const DEFAULT_VIEW_SIZE: (u32, u32) = (800, 600);
+// Distance from walls
+const PLAYER_X: i32 = 100;
 
 const PLAYER_1_CONTROLS: Controls = Controls {
   up: Scancode::W,
@@ -56,14 +59,19 @@ pub fn main() {
 
   let (view_width, view_height) = canvas.window().drawable_size();
   let view_port = (view_width, view_height);
+  let view_port_mid = Point::new((view_width / 2) as i32, (view_height / 2) as i32);
+  let view_scale = (view_width / DEFAULT_VIEW_SIZE.0) as i32;
 
   let mut player1 = Player::new(PLAYER_1_CONTROLS);
   let mut player2 = Player::new(PLAYER_2_CONTROLS);
   let mut ball = Ball::new();
 
   // Initialize entities
-  player1.set_position((0, 128));
-  player2.set_position(((view_width - player2.size().0) as i32, 128));
+  let player1_x = PLAYER_X * view_scale;
+  let player2_x = view_width as i32 - (PLAYER_X * view_scale);
+
+  player1.set_center((player1_x, view_port_mid.y()));
+  player2.set_center((player2_x, view_port_mid.y()));
 
   let mut game_state = GameState {
     view_port,
@@ -89,13 +97,8 @@ pub fn main() {
     }
 
     if !game_state.playing {
-      let (ball_width, ball_height) = ball.size();
-
       ball.set_velocity((0, 0));
-      ball.set_position((
-        ((view_width / 2) - (ball_width / 2)) as i32,
-        ((view_height / 2) - (ball_height / 2)) as i32,
-      ));
+      ball.set_center((view_port_mid.x(), view_port_mid.y()));
     }
 
     if !game_state.playing && game_state.keyboard_state.contains(&Scancode::Space) {

@@ -44,15 +44,18 @@ impl Player {
     self.position = Point::new(x, y);
   }
 
+  pub fn set_center(&mut self, pos: (i32, i32)) {
+    let (x, y) = pos;
+    let (width, height) = self.size;
+
+    self.position = Point::new(x - (width / 2) as i32, y - (height / 2) as i32);
+  }
+
   pub fn move_by(&mut self, delta: (i32, i32)) {
     let (dx, dy) = delta;
     let pos = self.position;
 
     self.position = Point::new(pos.x + dx, pos.y + dy);
-  }
-
-  pub fn size(&self) -> (u32, u32) {
-    self.size
   }
 
   pub fn as_rect(&self) -> Rect {
@@ -113,9 +116,11 @@ impl Ball {
     }
   }
 
-  pub fn set_position(&mut self, pos: (i32, i32)) {
+  pub fn set_center(&mut self, pos: (i32, i32)) {
     let (x, y) = pos;
-    self.position = Point::new(x, y);
+    let (width, height) = self.size;
+
+    self.position = Point::new(x - (width / 2) as i32, y - (height / 2) as i32);
   }
 
   pub fn set_velocity(&mut self, vel: (i32, i32)) {
@@ -125,10 +130,6 @@ impl Ball {
 
   pub fn starting_velocity(&mut self) {
     self.set_velocity((-BALL_VELOCITY, 0));
-  }
-
-  pub fn size(&self) -> (u32, u32) {
-    self.size
   }
 
   pub fn as_rect(&self) -> Rect {
