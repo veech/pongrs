@@ -58,12 +58,12 @@ pub fn main() {
   let view_port = (view_width, view_height);
 
   let mut player1 = Player::new(PLAYER_1_CONTROLS);
-  player1.set_position((0, 128));
-
   let mut player2 = Player::new(PLAYER_2_CONTROLS);
-  player2.set_position(((view_width - player2.size().0) as i32, 128));
-
   let mut ball = Ball::new();
+
+  // Initialize entities
+  player1.set_position((0, 128));
+  player2.set_position(((view_width - player2.size().0) as i32, 128));
 
   let mut game_state = GameState {
     view_port,
