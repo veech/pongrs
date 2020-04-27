@@ -64,15 +64,11 @@ pub fn main() {
   player2.set_position(((view_width - player2.size().0) as i32, 128));
 
   let mut ball = Ball::new();
-  let (ball_width, ball_height) = ball.size();
-  ball.set_position((
-    ((view_width / 2) - (ball_width / 2)) as i32,
-    ((view_height / 2) - (ball_height / 2)) as i32,
-  ));
 
   let mut game_state = GameState {
     view_port,
     keyboard_state: HashSet::new(),
+    playing: false,
     player_rects: Vec::new(),
     player_points: (0, 0),
   };
@@ -90,6 +86,21 @@ pub fn main() {
 
     if game_state.keyboard_state.contains(&Scancode::Escape) {
       break 'game;
+    }
+
+    if !game_state.playing {
+      let (ball_width, ball_height) = ball.size();
+
+      ball.set_velocity((0, 0));
+      ball.set_position((
+        ((view_width / 2) - (ball_width / 2)) as i32,
+        ((view_height / 2) - (ball_height / 2)) as i32,
+      ));
+    }
+
+    if !game_state.playing && game_state.keyboard_state.contains(&Scancode::Space) {
+      ball.starting_velocity();
+      game_state.playing = true;
     }
 
     canvas.set_draw_color(Color::RGB(0, 0, 0));

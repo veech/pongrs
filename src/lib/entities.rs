@@ -108,13 +108,22 @@ impl Ball {
       size: BALL_SIZE,
       color: BALL_COLOR,
 
-      velocity: Point::new(BALL_VELOCITY, 0),
+      velocity: Point::new(0, 0),
     }
   }
 
   pub fn set_position(&mut self, pos: (i32, i32)) {
     let (x, y) = pos;
     self.position = Point::new(x, y);
+  }
+
+  pub fn set_velocity(&mut self, vel: (i32, i32)) {
+    let (x, y) = vel;
+    self.velocity = Point::new(x, y);
+  }
+
+  pub fn starting_velocity(&mut self) {
+    self.set_velocity((BALL_VELOCITY, 0));
   }
 
   pub fn size(&self) -> (u32, u32) {
@@ -171,15 +180,13 @@ impl Entity for Ball {
     if self.position.x() >= (view_width - width) as i32 {
       let (p1_points, p2_points) = game_state.player_points;
       game_state.player_points = (p1_points + 1, p2_points);
-
-      self.velocity.x = -vel.x;
+      game_state.playing = false;
     };
 
     if self.position.x() <= 0 as i32 {
       let (p1_points, p2_points) = game_state.player_points;
       game_state.player_points = (p1_points, p2_points + 1);
-
-      self.velocity.x = -vel.x;
+      game_state.playing = false;
     };
 
     if self.position.y() >= (view_height - height) as i32 || self.position.y() <= 0 as i32 {

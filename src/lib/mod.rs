@@ -14,6 +14,7 @@ pub struct Controls {
 pub struct GameState {
   pub view_port: (u32, u32),
   pub keyboard_state: HashSet<Scancode>,
+  pub playing: bool,
   pub player_rects: Vec<Rect>,
   pub player_points: (u32, u32),
 }
