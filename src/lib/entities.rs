@@ -11,7 +11,7 @@ const PLAYER_WIDTH: u32 = 20;
 const PLAYER_HEIGHT: u32 = 150;
 
 const BALL_COLOR: Color = Color::RGB(255, 255, 255);
-const BALL_INITIAL_VELOCITY: i32 = 5;
+const BALL_INITIAL_VELOCITY: i32 = 10;
 const BALL_SIZE: (u32, u32) = (16, 16);
 
 pub trait Entity {
