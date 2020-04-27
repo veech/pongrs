@@ -7,9 +7,9 @@ use super::super::{Controls, GameState};
 use super::Entity;
 
 const PLAYER_COLOR: Color = Color::RGB(255, 255, 255);
-const PLAYER_VELOCITY: i32 = 25;
+const PLAYER_VELOCITY: i32 = 20;
 const PLAYER_WIDTH: u32 = 20;
-const PLAYER_HEIGHT: u32 = 150;
+const PLAYER_HEIGHT: u32 = 125;
 
 pub struct Player {
   size: (u32, u32),
@@ -66,7 +66,7 @@ impl Entity for Player {
 
     if game_state.keyboard_state.contains(&self.controls.up) {
       if (pos.y() - PLAYER_VELOCITY) > 0 {
-        self.move_by((0, -25));
+        self.move_by((0, -PLAYER_VELOCITY));
       } else {
         self.set_position((pos.x, 0));
       }
@@ -74,7 +74,7 @@ impl Entity for Player {
 
     if game_state.keyboard_state.contains(&self.controls.down) {
       if (pos.y() + PLAYER_VELOCITY) < (view_height - height) as i32 {
-        self.move_by((0, 25));
+        self.move_by((0, PLAYER_VELOCITY));
       } else {
         self.set_position((pos.x(), (view_height - height) as i32));
       }
