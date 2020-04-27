@@ -7,7 +7,7 @@ use std::time::Duration;
 use sdl2::event::Event;
 use sdl2::keyboard::Scancode;
 use sdl2::pixels::Color;
-use sdl2::rect::Point;
+use sdl2::rect::{Point, Rect};
 
 use sdl2::render::Canvas;
 use sdl2::video::Window;
@@ -29,6 +29,22 @@ const PLAYER_2_CONTROLS: Controls = Controls {
   up: Scancode::Up,
   down: Scancode::Down,
 };
+
+fn draw_dotted_line(canvas: &mut Canvas<Window>) {
+  let (view_width, view_height) = canvas.window().drawable_size();
+
+  let width = 5;
+  let height = 20;
+
+  let rect_x = ((view_width / 2) - (width / 2)) as i32;
+
+  let mut rect = Rect::new(rect_x, 0, width, height);
+
+  while (rect.y() as u32 + rect.height()) < view_height {
+    canvas.fill_rect(rect).expect("Unable to draw dotted line");
+    rect = Rect::new(rect_x, rect.y() + (height * 2) as i32, width, height);
+  }
+}
 
 fn create_canvas(context: &sdl2::Sdl) -> Canvas<Window> {
   let video_subsystem = context.video().expect("Couldn't get SDL video subsystem");
@@ -116,6 +132,8 @@ pub fn main() {
     player1.render(&mut canvas);
     player2.render(&mut canvas);
     ball.render(&mut canvas);
+
+    draw_dotted_line(&mut canvas);
 
     canvas.present();
 
