@@ -140,10 +140,10 @@ impl Ball {
   pub fn collides_with(&self, rect: Rect) -> bool {
     let ball_rect = self.as_rect();
 
-    return ball_rect.x() < rect.x() + rect.width() as i32
-      && ball_rect.x() + ball_rect.width() as i32 > rect.x()
-      && ball_rect.y() < rect.y() + rect.height() as i32
-      && ball_rect.y() + ball_rect.height() as i32 > rect.y();
+    return ball_rect.x() <= rect.x() + rect.width() as i32
+      && ball_rect.x() + ball_rect.width() as i32 >= rect.x()
+      && ball_rect.y() <= rect.y() + rect.height() as i32
+      && ball_rect.y() + ball_rect.height() as i32 >= rect.y();
   }
 }
 
