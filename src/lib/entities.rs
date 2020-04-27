@@ -11,8 +11,9 @@ const PLAYER_WIDTH: u32 = 20;
 const PLAYER_HEIGHT: u32 = 150;
 
 const BALL_COLOR: Color = Color::RGB(255, 255, 255);
-const BALL_VELOCITY: i32 = 20;
-const BALL_SIZE: (u32, u32) = (16, 16);
+const BALL_VELOCITY: i32 = 17;
+const BALL_WIDTH: u32 = 15;
+const BALL_HEIGHT: u32 = 15;
 
 pub trait Entity {
   fn update(&mut self, game_state: &mut GameState);
@@ -105,7 +106,7 @@ impl Ball {
   pub fn new() -> Ball {
     Ball {
       position: Point::new(0, 0),
-      size: BALL_SIZE,
+      size: (BALL_WIDTH, BALL_HEIGHT),
       color: BALL_COLOR,
 
       velocity: Point::new(0, 0),
@@ -123,7 +124,7 @@ impl Ball {
   }
 
   pub fn starting_velocity(&mut self) {
-    self.set_velocity((BALL_VELOCITY, 0));
+    self.set_velocity((-BALL_VELOCITY, 0));
   }
 
   pub fn size(&self) -> (u32, u32) {
