@@ -11,7 +11,7 @@ const PLAYER_WIDTH: u32 = 20;
 const PLAYER_HEIGHT: u32 = 150;
 
 const BALL_COLOR: Color = Color::RGB(255, 255, 255);
-const BALL_INITIAL_VELOCITY: i32 = 10;
+const BALL_VELOCITY: i32 = 20;
 const BALL_SIZE: (u32, u32) = (16, 16);
 
 pub trait Entity {
@@ -108,7 +108,7 @@ impl Ball {
       size: BALL_SIZE,
       color: BALL_COLOR,
 
-      velocity: Point::new(BALL_INITIAL_VELOCITY, BALL_INITIAL_VELOCITY),
+      velocity: Point::new(BALL_VELOCITY, 0),
     }
   }
 
@@ -151,7 +151,20 @@ impl Entity for Ball {
 
     for rect in game_state.player_rects.iter() {
       if self.collides_with(*rect) {
-        self.velocity.x = -vel.x;
+        let ball_center = self.as_rect().center();
+        let paddle_center = (*rect).center();
+
+        let y_diff = (ball_center.y() - paddle_center.y()) as f32;
+        let x_diff = (ball_center.x() - paddle_center.x()) as f32;
+
+        // Scale down value of slope for better launch angles
+        let slope: f32 = (y_diff / (x_diff * 5.0)).abs();
+
+        let dy = y_diff.signum() * BALL_VELOCITY as f32 * (slope / (slope.powf(2.0) + 1.0).sqrt());
+        let dx = x_diff.signum() * BALL_VELOCITY as f32 * (1.0 / (slope.powf(2.0) + 1.0).sqrt());
+
+        self.velocity.x = dx.round() as i32;
+        self.velocity.y = dy.round() as i32;
       }
     }
 
