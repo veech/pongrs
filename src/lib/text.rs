@@ -4,8 +4,8 @@ use sdl2::render::{Canvas, Texture, TextureCreator};
 use sdl2::ttf::Font;
 use sdl2::video::{Window, WindowContext};
 
-const FONT_WIDTH: u32 = 100;
-const FONT_HEIGHT: u32 = 200;
+pub const FONT_WIDTH: u32 = 100;
+pub const FONT_HEIGHT: u32 = 200;
 const FONT_COLOR: Color = Color::RGB(255, 255, 255);
 
 fn create_texture_from_string<'a>(
@@ -27,7 +27,7 @@ pub fn generate_score_textures<'a>(
   texture_creator: &'a TextureCreator<WindowContext>,
   font: &Font,
 ) -> Vec<Texture<'a>> {
-  let score_values: Vec<_> = (0u8..9).collect();
+  let score_values: Vec<_> = (0u8..10).collect();
 
   let score_textures = score_values
     .iter()

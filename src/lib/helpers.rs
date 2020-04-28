@@ -1,15 +1,18 @@
+use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 
 use sdl2::render::Canvas;
 use sdl2::video::Window;
 
-pub fn draw_dotted_line(canvas: &mut Canvas<Window>) {
+pub fn draw_dotted_line(canvas: &mut Canvas<Window>, color: Color) {
   let (view_width, view_height) = canvas.window().drawable_size();
 
   let width = 5;
   let height = 20;
 
   let rect_x = ((view_width / 2) - (width / 2)) as i32;
+
+  canvas.set_draw_color(color);
 
   let mut rect = Rect::new(rect_x, 0, width, height);
 

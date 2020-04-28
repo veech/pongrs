@@ -17,8 +17,13 @@ use lib::text;
 use lib::{Controls, GameState};
 
 const DEFAULT_VIEW_SIZE: (u32, u32) = (800, 600);
+
 // Distance from walls
 const PLAYER_X: i32 = 100;
+
+// Distance from midpoint
+const SCORE_X: i32 = 250;
+const SCORE_Y: i32 = 100;
 
 static FONT_PATH: &str = "src/assets/font.ttf";
 
@@ -110,10 +115,18 @@ pub fn main() {
     ball.render(&mut canvas);
 
     let (player1_score, player2_score) = game_state.player_scores;
-    text::render_string_texture(&mut canvas, &score_textures[player1_score], (0, 0));
-    text::render_string_texture(&mut canvas, &score_textures[player2_score], (50, 0));
+    let font_mid = (text::FONT_WIDTH / 2) as i32;
 
-    helpers::draw_dotted_line(&mut canvas);
+    let player1_score_pos = (view_port_mid.x() - SCORE_X - font_mid, SCORE_Y);
+    let player1_score_texture = &score_textures[player1_score];
+
+    let player2_score_pos = (view_port_mid.x() + SCORE_X - font_mid, SCORE_Y);
+    let player2_score_texture = &score_textures[player2_score];
+
+    text::render_string_texture(&mut canvas, player1_score_texture, player1_score_pos);
+    text::render_string_texture(&mut canvas, player2_score_texture, player2_score_pos);
+
+    helpers::draw_dotted_line(&mut canvas, Color::RGB(255, 255, 255));
 
     canvas.present();
 
