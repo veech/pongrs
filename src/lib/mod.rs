@@ -17,5 +17,5 @@ pub struct GameState {
   pub keyboard_state: HashSet<Scancode>,
   pub playing: bool,
   pub player_rects: Vec<Rect>,
-  pub player_points: (u32, u32),
+  pub player_scores: (usize, usize),
 }

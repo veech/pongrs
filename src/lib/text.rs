@@ -8,9 +8,9 @@ const FONT_WIDTH: u32 = 100;
 const FONT_HEIGHT: u32 = 200;
 const FONT_COLOR: Color = Color::RGB(255, 255, 255);
 
-pub fn create_texture_from_string<'a>(
+fn create_texture_from_string<'a>(
   texture_creator: &'a TextureCreator<WindowContext>,
-  font: Font,
+  font: &Font,
   string: String,
 ) -> Texture<'a> {
   let surface = font
@@ -21,6 +21,20 @@ pub fn create_texture_from_string<'a>(
   return texture_creator
     .create_texture_from_surface(&surface)
     .expect("Unable to create font texture");
+}
+
+pub fn generate_score_textures<'a>(
+  texture_creator: &'a TextureCreator<WindowContext>,
+  font: &Font,
+) -> Vec<Texture<'a>> {
+  let score_values: Vec<_> = (0u8..9).collect();
+
+  let score_textures = score_values
+    .iter()
+    .map(|num| create_texture_from_string(texture_creator, font, num.to_string()))
+    .collect();
+
+  return score_textures;
 }
 
 pub fn render_string_texture(canvas: &mut Canvas<Window>, string: &Texture, position: (i32, i32)) {

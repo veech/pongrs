@@ -93,14 +93,14 @@ impl Entity for Ball {
     }
 
     if self.position.x() >= (view_width - width) as i32 {
-      let (p1_points, p2_points) = game_state.player_points;
-      game_state.player_points = (p1_points + 1, p2_points);
+      let (p1_points, p2_points) = game_state.player_scores;
+      game_state.player_scores = (p1_points + 1, p2_points);
       game_state.playing = false;
     };
 
     if self.position.x() <= 0 as i32 {
-      let (p1_points, p2_points) = game_state.player_points;
-      game_state.player_points = (p1_points, p2_points + 1);
+      let (p1_points, p2_points) = game_state.player_scores;
+      game_state.player_scores = (p1_points, p2_points + 1);
       game_state.playing = false;
     };
 

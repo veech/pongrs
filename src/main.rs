@@ -93,7 +93,7 @@ pub fn main() {
   let mut player2 = Player::new(PLAYER_2_CONTROLS);
   let mut ball = Ball::new();
 
-  let texture_0 = text::create_texture_from_string(&texture_creator, font, String::from("0"));
+  let score_textures = text::generate_score_textures(&texture_creator, &font);
 
   // Initialize entities
   let player1_x = PLAYER_X * view_scale;
@@ -107,7 +107,7 @@ pub fn main() {
     keyboard_state: HashSet::new(),
     playing: false,
     player_rects: Vec::new(),
-    player_points: (0, 0),
+    player_scores: (0, 0),
   };
 
   'game: loop {
@@ -146,9 +146,11 @@ pub fn main() {
     player2.render(&mut canvas);
     ball.render(&mut canvas);
 
-    draw_dotted_line(&mut canvas);
+    let (player1_score, player2_score) = game_state.player_scores;
+    text::render_string_texture(&mut canvas, &score_textures[player1_score], (0, 0));
+    text::render_string_texture(&mut canvas, &score_textures[player2_score], (50, 0));
 
-    text::render_string_texture(&mut canvas, &texture_0, (0, 0));
+    draw_dotted_line(&mut canvas);
 
     canvas.present();
 
