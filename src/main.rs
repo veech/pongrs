@@ -114,7 +114,13 @@ pub fn main() {
     player2.render(&mut canvas);
     ball.render(&mut canvas);
 
+    // Render scores
+    if game_state.player_scores.0 > 9 || game_state.player_scores.1 > 9 {
+      game_state.player_scores = (0, 0);
+    }
+
     let (player1_score, player2_score) = game_state.player_scores;
+
     let font_mid = (text::FONT_WIDTH / 2) as i32;
 
     let player1_score_pos = (view_port_mid.x() - SCORE_X - font_mid, SCORE_Y);
