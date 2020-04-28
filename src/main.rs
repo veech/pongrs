@@ -1,6 +1,7 @@
 extern crate sdl2;
 
 use std::collections::HashSet;
+use std::path::Path;
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -8,6 +9,9 @@ use sdl2::event::Event;
 use sdl2::keyboard::Scancode;
 use sdl2::pixels::Color;
 use sdl2::rect::{Point, Rect};
+use sdl2::render::{Texture, TextureCreator};
+use sdl2::ttf::Font;
+use sdl2::video::WindowContext;
 
 use sdl2::render::Canvas;
 use sdl2::video::Window;
@@ -19,6 +23,10 @@ use lib::{Controls, GameState};
 const DEFAULT_VIEW_SIZE: (u32, u32) = (800, 600);
 // Distance from walls
 const PLAYER_X: i32 = 100;
+
+static FONT_PATH: &str = "src/assets/font.ttf";
+const FONT_SIZE: u16 = 128;
+const FONT_COLOR: Color = Color::RGB(255, 255, 255);
 
 const PLAYER_1_CONTROLS: Controls = Controls {
   up: Scancode::W,
@@ -46,11 +54,27 @@ fn draw_dotted_line(canvas: &mut Canvas<Window>) {
   }
 }
 
+fn create_texture_from_string<'a>(
+  texture_creator: &'a TextureCreator<WindowContext>,
+  font: Font,
+  string: String,
+) -> Texture<'a> {
+  let surface = font
+    .render(&string)
+    .blended(FONT_COLOR)
+    .expect("Unable to create font surface");
+
+  return texture_creator
+    .create_texture_from_surface(&surface)
+    .expect("Unable to create font texture");
+}
+
 fn create_canvas(context: &sdl2::Sdl) -> Canvas<Window> {
   let video_subsystem = context.video().expect("Couldn't get SDL video subsystem");
+  let (view_width, view_height) = DEFAULT_VIEW_SIZE;
 
   let window = video_subsystem
-    .window("pongrs", DEFAULT_VIEW_SIZE.0, DEFAULT_VIEW_SIZE.1)
+    .window("pongrs", view_width, view_height)
     .position_centered()
     .opengl()
     .build()
@@ -66,8 +90,14 @@ fn create_canvas(context: &sdl2::Sdl) -> Canvas<Window> {
 
 pub fn main() {
   let sdl_context = sdl2::init().expect("SDL initialization failed");
+  let ttf_context = sdl2::ttf::init().expect("TTF context initialization failed");
 
   let mut canvas = create_canvas(&sdl_context);
+  let texture_creator = canvas.texture_creator();
+
+  let font = ttf_context
+    .load_font(Path::new(&FONT_PATH), FONT_SIZE)
+    .expect("Unable to load font");
 
   let mut event_pump = sdl_context
     .event_pump()
@@ -81,6 +111,8 @@ pub fn main() {
   let mut player1 = Player::new(PLAYER_1_CONTROLS);
   let mut player2 = Player::new(PLAYER_2_CONTROLS);
   let mut ball = Ball::new();
+
+  let texture_0 = create_texture_from_string(&texture_creator, font, String::from("0"));
 
   // Initialize entities
   let player1_x = PLAYER_X * view_scale;
@@ -134,6 +166,10 @@ pub fn main() {
     ball.render(&mut canvas);
 
     draw_dotted_line(&mut canvas);
+
+    canvas
+      .copy(&texture_0, None, Rect::new(0, 0, 100, 200))
+      .expect("Unable to copy texture");
 
     canvas.present();
 
