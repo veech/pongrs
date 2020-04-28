@@ -4,6 +4,7 @@ use sdl2::keyboard::Scancode;
 use sdl2::rect::Rect;
 
 pub mod entities;
+pub mod helpers;
 pub mod text;
 
 #[derive(Debug, Copy, Clone)]
